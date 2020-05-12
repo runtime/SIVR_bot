@@ -18,34 +18,24 @@ admin.initializeApp(
 process.env.DEBUG = "dialogflow:debug";
 
 const db = admin.database();
-var ref = db.ref('/calls/');
+let ref = db.ref('/calls/');
 
+let call = {};
 
-app.intent('SIVR-save-user-data', (conv, params) => {
-	//const {conversationdata} = conv.data;
-  
-  	//const {call} = conv.data;
-  	const {coords} = conv.device.location;
-    const city = conv.device.location.city;
-  
-  	return ref.push(coords.latitude).then(() => {
-      conv.ask('data saved');
-    }).catch(() => {
-      conv.ask('could not save data');
-    });
+app.intent('SIVR-get-name', (conv, {name}) => {
+    conv.data.name = name;
+    call.name = conv.data.name;
+    console.log('call.name: ' + call.name);
+    return conv.ask(`thank you ${name}, can you let me know about where you are?`);
 });
 
-app.intent('SIVR-get-location', (conv) => {
-  
-	conv.data.requestedPermission = 'DEVICE_PRECISE_LOCATION';
-  
-    return conv.ask(new Permission({
-        context: 'to locate you',
-        permissions: conv.data.requestedPermission,
-      
-    }));
-   
-});
+app.intent('SIVR-get-users-location', (conv, {location}) => {
+    conv.data.location = location;
+  	call.location = conv.data.location.
+  	console.log(conv.data.location);
+    //return conv.ask('i understand that you are at got you');
+    return conv.ask(`got it you're around, ${location.street_address}, can you tell me briefly what your situation is?`);
+}); 
 
 app.intent('SIVR-user-Info', (conv, params, permissionGranted) => {
    
